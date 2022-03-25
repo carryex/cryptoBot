@@ -13,6 +13,9 @@ export const ORDERS_SCENE = 'ORDERS_SCENE';
 export const CANCEL_ORDER_SCENE = 'CANCEL_ORDER_SCENE';
 export const ESTATE_SCENE = 'ESTATE_SCENE';
 export const URGENT_SCENE = 'URGENT_SCENE';
+export const EUR_TO_USDT_AMOUNT_SCENE = 'EUR_TO_USDT_AMOUNT_SCENE';
+export const EUR_TO_USDT_WALLET_SCENE = 'EUR_TO_USDT__WALLET_SCENE';
+export const EUR_TO_USDT_APPROVE_SCENE = 'EUR_TO_USDT_APPROVE_SCENE';
 
 export const MIN_AMOUNT = 30;
 export const COMMANDS = {
@@ -88,4 +91,7 @@ status: wait\nЗаявка №765433456\nwallet: TGx293hyPSQfExbjbVzbPgcciETJrTZ
   CANCEL_ORDER: `Ваша заявка успешно отменена`,
   ORDER: `Заявка №\nwallet: 353424r3ef2r3f\namount: 666\nstatus: wait`,
   URGENT: `🔥 В случае срочной обналички комиссия составит 5% от суммы.`,
+  EUR_TO_USDT_AMOUNT: `введите сумму, на которую вы хотите купить  USDT`,
+  EUR_TO_USDT_WALLET: `Введите номер вашего кошелька для получения USDT (TRC20)`,
+  EUR_TO_USDT_APPROVE: `Заявка №\nwallet: 353424r3ef2r3f\namount: 666\nstatus: approved\n\nмы свяжемся с вами для передачи средств`,
 };

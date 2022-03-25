@@ -135,10 +135,29 @@ export class BotService {
     return;
   }
 
+  async eurToUsdtApprove(ctx: Context) {
+    const buttons = [[BUTTONS.OK, BUTTONS.SUPPORT]];
+    const inlineButtons = Markup.inlineKeyboard(buttons);
+    await replyOrEdit(ctx, TEXT.EUR_TO_USDT_APPROVE, inlineButtons);
+    return;
+  }
+
   async urgent(ctx: Context) {
     const buttons = [BUTTONS.CONTINUE, BUTTONS.BACK];
     const inlineButtons = Markup.inlineKeyboard(buttons);
     await replyOrEdit(ctx, TEXT.URGENT, inlineButtons);
     return;
+  }
+
+  async eurAmount(ctx: Context) {
+    const buttons = [BUTTONS.BACK, BUTTONS.SUPPORT];
+    const inlineButtons = Markup.inlineKeyboard(buttons);
+    await replyOrEdit(ctx, TEXT.EUR_TO_USDT_AMOUNT, inlineButtons);
+  }
+
+  async eurWallet(ctx: Context) {
+    const buttons = [BUTTONS.BACK, BUTTONS.SUPPORT];
+    const inlineButtons = Markup.inlineKeyboard(buttons);
+    await replyOrEdit(ctx, TEXT.EUR_TO_USDT_WALLET, inlineButtons);
   }
 }

@@ -1,7 +1,12 @@
 import { UseFilters, UseInterceptors } from '@nestjs/common';
 import { InjectBot, Ctx, Start, Update, Action } from 'nestjs-telegraf';
 import { Telegraf } from 'telegraf';
-import { BotName, ESTATE_SCENE, MARKET_SCENE } from './bot.constants';
+import {
+  BotName,
+  ESTATE_SCENE,
+  EUR_TO_USDT_AMOUNT_SCENE,
+  MARKET_SCENE,
+} from './bot.constants';
 import { BotFilter } from './bot.filter';
 import { BotInterceptor } from './bot.interceptor';
 import { Context } from './bot.interface';
@@ -35,9 +40,9 @@ export class BotUpdate {
     await context.scene.enter(MARKET_SCENE);
   }
 
-  @Action(COMMANDS.USDT_TO_EUR)
+  @Action(COMMANDS.EUR_TO_USDT)
   async onEurToUsdt(@Ctx() context: Context) {
-    await context.scene.enter(MARKET_SCENE);
+    await context.scene.enter(EUR_TO_USDT_AMOUNT_SCENE);
   }
 
   @Action(COMMANDS.ESTATE)

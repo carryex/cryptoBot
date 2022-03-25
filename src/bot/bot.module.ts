@@ -20,6 +20,9 @@ import { ApproveScene } from './scenes/approve.scene';
 import { CancelOrderScene } from './scenes/cancelOrder.scene';
 import { OrderScene } from './scenes/order.scene';
 import { UrgentScene } from './scenes/urgent.scene';
+import { EurToUsdtAmountScene } from './scenes/eurToUsdtAmount.scene';
+import { EurToUsdtApproveScene } from './scenes/eurToUsdtApprove.scene';
+import { EurToUsdtWalletScene } from './scenes/eurToUsdtWallet.scene';
 
 @Module({
   imports: [
@@ -50,6 +53,9 @@ import { UrgentScene } from './scenes/urgent.scene';
     CancelOrderScene,
     OrderScene,
     UrgentScene,
+    EurToUsdtAmountScene,
+    EurToUsdtApproveScene,
+    EurToUsdtWalletScene,
   ],
 })
 export class BotModule {}

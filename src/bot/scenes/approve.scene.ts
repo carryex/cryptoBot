@@ -1,6 +1,5 @@
 import { Scene, SceneEnter, Ctx, Action } from 'nestjs-telegraf';
 import {
-  APPROVE_TRANSACTION_SCENE,
   APPROVE_SCENE,
   CANCEL_ORDER_SCENE,
   PULL_STATUS_SCENE,
