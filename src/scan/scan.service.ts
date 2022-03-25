@@ -22,7 +22,7 @@ export class ScanService {
   async validateCryptoWallet(
     wallet: string,
     amount: number,
-    notEnougthMoneyText: (value: string) => string,
+    notEnougthMoneyText: (value: string, min: number) => string,
     notFoundText: string,
   ) {
     if (amount < MIN_AMOUNT) {
@@ -42,7 +42,7 @@ export class ScanService {
           return true;
         }
         return {
-          message: notEnougthMoneyText(formatedBalance.toString()),
+          message: notEnougthMoneyText(formatedBalance.toString(), MIN_AMOUNT),
         };
       }
     }

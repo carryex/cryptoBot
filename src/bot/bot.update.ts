@@ -1,16 +1,7 @@
-import { UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
-import {
-  Help,
-  InjectBot,
-  Ctx,
-  Start,
-  Update,
-  Command,
-  Action,
-} from 'nestjs-telegraf';
-import { AdminGuard } from '../admin/admin.guard';
+import { UseFilters, UseInterceptors } from '@nestjs/common';
+import { InjectBot, Ctx, Start, Update, Action } from 'nestjs-telegraf';
 import { Telegraf } from 'telegraf';
-import { BotName, MARKET_SCENE } from '../app.constants';
+import { BotName, ESTATE_SCENE, MARKET_SCENE } from './bot.constants';
 import { BotFilter } from './bot.filter';
 import { BotInterceptor } from './bot.interceptor';
 import { Context } from './bot.interface';
@@ -39,25 +30,18 @@ export class BotUpdate {
     return;
   }
 
-  @Help()
-  async onHelp(): Promise<string> {
-    return 'Send me any text';
-  }
-
-  @Command(COMMANDS.MARKET)
-  @Action('MARKET')
-  async onAnswer(@Ctx() context: Context) {
+  @Action(COMMANDS.USDT_TO_EUR)
+  async onUsdtToEur(@Ctx() context: Context) {
     await context.scene.enter(MARKET_SCENE);
   }
 
-  @Command(COMMANDS.ADMIN)
-  @UseGuards(AdminGuard)
-  async onAdminCommand(): Promise<string> {
-    return 'Welcome judge';
+  @Action(COMMANDS.USDT_TO_EUR)
+  async onEurToUsdt(@Ctx() context: Context) {
+    await context.scene.enter(MARKET_SCENE);
   }
 
-  @Command(COMMANDS.SETTINGS)
-  async onSettingsCommand(): Promise<string> {
-    return 'Welcome judge';
+  @Action(COMMANDS.ESTATE)
+  async onEstate(@Ctx() context: Context) {
+    await context.scene.enter(ESTATE_SCENE);
   }
 }

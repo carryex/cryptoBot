@@ -6,7 +6,13 @@ import {
   Action,
   On,
 } from 'nestjs-telegraf';
-import { AMOUNT_SCENE, CONFIRM_SCENE, WALLET_SCENE } from '../../app.constants';
+import {
+  AMOUNT_SCENE,
+  APPROVE_SCENE,
+  SUPPORT_SCENE,
+  WALLET_SCENE,
+} from '../bot.constants';
+import { COMMANDS } from '../bot.constants';
 import { Context } from '../bot.interface';
 import { BotService } from '../bot.service';
 import { commandHandler, deleteUserReplyMessage } from '../bot.utils';
@@ -20,7 +26,13 @@ export class AmountScene {
     return;
   }
 
-  @Action('BACK')
+  @Action(COMMANDS.SUPPORT)
+  async onSupportAction(@Ctx() ctx: Context) {
+    await ctx.scene.enter(SUPPORT_SCENE);
+    return;
+  }
+
+  @Action(COMMANDS.BACK)
   async onBackAction(@Ctx() ctx: Context) {
     await ctx.scene.enter(WALLET_SCENE);
     return;
@@ -45,7 +57,7 @@ export class AmountScene {
         return;
       }
       const { wallet } = ctx.scene.session.state as any;
-      await ctx.scene.enter(CONFIRM_SCENE, { wallet, amount });
+      await ctx.scene.enter(APPROVE_SCENE, { wallet, amount });
       return;
     }
   }

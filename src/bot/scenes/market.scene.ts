@@ -1,5 +1,11 @@
-import { Scene, SceneEnter, SceneLeave, Ctx, Action } from 'nestjs-telegraf';
-import { MARKET_SCENE, WALLET_SCENE } from '../../app.constants';
+import { Scene, SceneEnter, Ctx, Action } from 'nestjs-telegraf';
+import {
+  COMMANDS,
+  HOW_SCENE,
+  MARKET_SCENE,
+  URGENT_SCENE,
+  WALLET_SCENE,
+} from '../bot.constants';
 import { Context } from '../bot.interface';
 import { BotService } from '../bot.service';
 
@@ -12,28 +18,28 @@ export class MarketScene {
     return;
   }
 
-  @Action('BACK')
-  async onBackAction(@Ctx() ctx: Context) {
+  @Action(COMMANDS.MAIN_MENU)
+  async onMainMenuAction(@Ctx() ctx: Context) {
     await this.botService.start(ctx);
     await ctx.scene.leave();
     return;
   }
 
-  @Action('ENTER_PULL')
-  async onSellAction(@Ctx() ctx: Context) {
-    await ctx.scene.enter(WALLET_SCENE);
+  @Action(COMMANDS.ENTER_PULL)
+  async onEnterPullAction(@Ctx() ctx: Context) {
+    await ctx.scene.enter(WALLET_SCENE, { prevScene: MARKET_SCENE });
     return;
   }
 
-  @Action('BYE')
-  async onByeAction(@Ctx() ctx: Context) {
-    console.log('bye');
+  @Action(COMMANDS.HOW)
+  async onHowAction(@Ctx() ctx: Context) {
+    await ctx.scene.enter(HOW_SCENE);
     return;
   }
 
-  @SceneLeave()
-  onSceneLeave() {
-    console.log('Leave from scene');
+  @Action(COMMANDS.URGENT)
+  async onUrgentAction(@Ctx() ctx: Context) {
+    await ctx.scene.enter(URGENT_SCENE);
     return;
   }
 }
