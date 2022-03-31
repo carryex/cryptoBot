@@ -1,14 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { ScanService } from '../scan/scan.service';
-import { Markup } from 'telegraf';
+import { Markup, Telegraf } from 'telegraf';
 import { Context } from './bot.interface';
 import { orderService, replyOrEdit } from './bot.utils';
-import { BUTTONS, TEXT } from './bot.constants';
+import { BotName, BUTTONS, PULL_FILLED_SCENE, TEXT } from './bot.constants';
+import { Order } from 'src/order/order.entity';
+import { InjectBot } from 'nestjs-telegraf';
 @Injectable()
 export class BotService {
-  constructor(private scanService: ScanService) {}
-  echo(text: string): string {
-    return `Echo: ${text}`;
+  constructor(
+    @InjectBot(BotName)
+    private readonly bot: Telegraf<Context>,
+    private scanService: ScanService,
+  ) {}
+
+  async sendMessage(order: Order) {
+    const buttons = [[BUTTONS.APPROVE_TRANSACTION, BUTTONS.ORDERS]];
+    const inlineButtons = Markup.inlineKeyboard(buttons);
+    // this.bot.context.scene.enter(PULL_FILLED_SCENE, { orderId: order.id });
+    const message = await this.bot.telegram.sendMessage(
+      order.chatId,
+      TEXT.PULL_FILLED(order.amount),
+      // inlineButtons,
+    );
+    console.log(message);
+    return message;
   }
 
   async start(ctx: Context) {
@@ -36,17 +52,11 @@ export class BotService {
     return;
   }
 
-  async validateWallet(wallet: string, min: number) {
-    return await this.scanService.validateCryptoWallet(
-      wallet,
-      min,
-      TEXT.NOT_ENOUGHT_MONEY,
-      TEXT.WALLET_NOT_FOUND,
-    );
-  }
-
-  async amount(ctx: Context) {
-    const buttons = [[BUTTONS.MAX, BUTTONS.SUPPORT], [BUTTONS.BACK]];
+  async amount(ctx: Context, balance?: number) {
+    const buttons = [
+      balance ? [BUTTONS.MAX(balance), BUTTONS.SUPPORT] : [BUTTONS.SUPPORT],
+      [BUTTONS.BACK],
+    ];
     const inlineKeyboard = Markup.inlineKeyboard(buttons);
     await replyOrEdit(ctx, TEXT.AMOUNT, inlineKeyboard);
     return;
@@ -57,19 +67,24 @@ export class BotService {
     return;
   }
 
-  async invalidAmount(ctx: Context, text: string) {
-    await orderService(ctx, text);
+  async invalidAmount(ctx: Context, balance?: number) {
+    const buttons = [
+      balance ? [BUTTONS.MAX(balance), BUTTONS.SUPPORT] : [BUTTONS.SUPPORT],
+      [BUTTONS.BACK],
+    ];
+    const inlineKeyboard = Markup.inlineKeyboard(buttons);
+    await replyOrEdit(ctx, TEXT.INVALID_AMOUNT, inlineKeyboard);
     return;
   }
 
-  async validateAmount(ctx: Context, amount: number) {
-    const { wallet } = ctx.scene.session.state;
-    return await this.scanService.validateCryptoWallet(
-      wallet,
-      amount,
-      TEXT.NOT_ENOUGHT_MONEY,
-      TEXT.WALLET_NOT_FOUND,
-    );
+  async invalidAmountFormat(ctx: Context, balance?: number) {
+    const buttons = [
+      balance ? [BUTTONS.MAX(balance), BUTTONS.SUPPORT] : [BUTTONS.SUPPORT],
+      [BUTTONS.BACK],
+    ];
+    const inlineKeyboard = Markup.inlineKeyboard(buttons);
+    await replyOrEdit(ctx, TEXT.INVALID_AMOUNT_FORMAT, inlineKeyboard);
+    return;
   }
 
   async approve(ctx: Context) {
@@ -88,10 +103,10 @@ export class BotService {
     await replyOrEdit(ctx, TEXT.HOW, inlineKeyboard);
   }
 
-  async pullStatus(ctx: Context) {
+  async pullStatus(ctx: Context, fill: number) {
     const buttons = [[BUTTONS.SUPPORT, BUTTONS.BACK]];
     const inlineKeyboard = Markup.inlineKeyboard(buttons);
-    await replyOrEdit(ctx, TEXT.PULL_STATUS, inlineKeyboard);
+    await replyOrEdit(ctx, TEXT.PULL_STATUS(fill), inlineKeyboard);
   }
 
   async support(ctx: Context) {
@@ -103,13 +118,13 @@ export class BotService {
     await replyOrEdit(ctx, TEXT.SUPPORT, inlineKeyboard);
   }
 
-  async orders(ctx: Context) {
+  async orders(ctx: Context, orders: Order[]) {
     const buttons = [
       [BUTTONS.PULL_STATUS, BUTTONS.SUPPORT],
       [BUTTONS.MAIN_MENU],
     ];
     const inlineKeyboard = Markup.inlineKeyboard(buttons);
-    await replyOrEdit(ctx, TEXT.ORDERS, inlineKeyboard);
+    await replyOrEdit(ctx, TEXT.ORDERS(orders), inlineKeyboard);
   }
 
   async estate(ctx: Context) {
@@ -125,21 +140,31 @@ export class BotService {
     return;
   }
 
-  async order(ctx: Context) {
+  async order(ctx: Context, { id, wallet, amount, status }: Order) {
     const buttons = [
       [BUTTONS.PULL_STATUS, BUTTONS.ORDERS],
       [BUTTONS.MAIN_MENU, BUTTONS.SUPPORT],
     ];
     const inlineButtons = Markup.inlineKeyboard(buttons);
-    await replyOrEdit(ctx, TEXT.ORDER, inlineButtons);
+    await replyOrEdit(
+      ctx,
+      TEXT.ORDER(id, wallet, amount, status),
+      inlineButtons,
+    );
     return;
   }
 
-  async eurToUsdtApprove(ctx: Context) {
+  async eurToUsdtApprove(ctx: Context, order: Order) {
     const buttons = [[BUTTONS.OK, BUTTONS.SUPPORT]];
     const inlineButtons = Markup.inlineKeyboard(buttons);
-    await replyOrEdit(ctx, TEXT.EUR_TO_USDT_APPROVE, inlineButtons);
+    await replyOrEdit(ctx, TEXT.EUR_TO_USDT_APPROVE(order), inlineButtons);
     return;
+  }
+
+  async eurToUsdtInvalidAmount(ctx: Context) {
+    const buttons = [BUTTONS.BACK, BUTTONS.SUPPORT];
+    const inlineButtons = Markup.inlineKeyboard(buttons);
+    await replyOrEdit(ctx, TEXT.EUR_TO_USDT_AMOUNT, inlineButtons);
   }
 
   async urgent(ctx: Context) {
@@ -159,5 +184,11 @@ export class BotService {
     const buttons = [BUTTONS.BACK, BUTTONS.SUPPORT];
     const inlineButtons = Markup.inlineKeyboard(buttons);
     await replyOrEdit(ctx, TEXT.EUR_TO_USDT_WALLET, inlineButtons);
+  }
+
+  async walletNotFound(ctx: Context) {
+    const buttons = [BUTTONS.SUPPORT, BUTTONS.BACK];
+    const inlineButtons = Markup.inlineKeyboard(buttons);
+    await replyOrEdit(ctx, TEXT.WALLET_NOT_FOUND, inlineButtons);
   }
 }

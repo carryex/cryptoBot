@@ -70,3 +70,16 @@ export const commandHandler = (
   }
   return false;
 };
+
+export const addPrevScene = (ctx: Context, scene: string) => {
+  const state = ctx.scene.session.state;
+  state.prevScene ? state.prevScene.push(scene) : (state.prevScene = [scene]);
+  return state;
+};
+
+export const backCallback = (ctx: Context, scene: string) => {
+  const state = ctx.scene.session.state;
+  const prevScene = state.prevScene?.pop() || scene;
+
+  return { scene: prevScene, state };
+};

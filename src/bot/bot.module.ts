@@ -23,11 +23,16 @@ import { UrgentScene } from './scenes/urgent.scene';
 import { EurToUsdtAmountScene } from './scenes/eurToUsdtAmount.scene';
 import { EurToUsdtApproveScene } from './scenes/eurToUsdtApprove.scene';
 import { EurToUsdtWalletScene } from './scenes/eurToUsdtWallet.scene';
+import { OrderModule } from 'src/order/order.module';
+import { PullFilledScene } from './scenes/pullFilled.scene';
+import { PullModule } from 'src/pull/pull.module';
 
 @Module({
   imports: [
     ScanModule,
+    OrderModule,
     UserModule,
+    PullModule,
     TelegrafModule.forRootAsync({
       botName: BotName,
       useFactory: () => ({
@@ -56,6 +61,8 @@ import { EurToUsdtWalletScene } from './scenes/eurToUsdtWallet.scene';
     EurToUsdtAmountScene,
     EurToUsdtApproveScene,
     EurToUsdtWalletScene,
+    PullFilledScene,
   ],
+  exports: [BotService],
 })
 export class BotModule {}

@@ -13,5 +13,11 @@ interface SessionData extends Scenes.SceneSession<MySceneSession> {
 }
 
 interface MySceneSession extends Scenes.SceneSessionData {
-  state: { wallet?: string; amount?: string; prevScene?: string };
+  state: {
+    wallet?: string;
+    amount?: string;
+    prevScene?: string[];
+    orderId?: number;
+    walletBalance?: number;
+  };
 }

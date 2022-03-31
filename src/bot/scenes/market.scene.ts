@@ -1,3 +1,4 @@
+import { UseFilters } from '@nestjs/common';
 import { Scene, SceneEnter, Ctx, Action } from 'nestjs-telegraf';
 import {
   COMMANDS,
@@ -6,14 +7,18 @@ import {
   URGENT_SCENE,
   WALLET_SCENE,
 } from '../bot.constants';
+import { BotFilter } from '../bot.filter';
 import { Context } from '../bot.interface';
 import { BotService } from '../bot.service';
+import { addPrevScene } from '../bot.utils';
 
 @Scene(MARKET_SCENE)
+@UseFilters(BotFilter)
 export class MarketScene {
   constructor(private readonly botService: BotService) {}
   @SceneEnter()
   async onSceneEnter(@Ctx() ctx: Context) {
+    addPrevScene(ctx, MARKET_SCENE);
     await this.botService.market(ctx);
     return;
   }
@@ -27,7 +32,7 @@ export class MarketScene {
 
   @Action(COMMANDS.ENTER_PULL)
   async onEnterPullAction(@Ctx() ctx: Context) {
-    await ctx.scene.enter(WALLET_SCENE, { prevScene: MARKET_SCENE });
+    await ctx.scene.enter(WALLET_SCENE, ctx.scene.session.state);
     return;
   }
 

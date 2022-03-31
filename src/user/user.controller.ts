@@ -10,5 +10,5 @@ import { User } from './entities/user.entity';
 })
 @Controller('user')
 export class UserController {
-  constructor(private readonly service: UserService) {}
+  constructor(private readonly userService: UserService) {}
 }

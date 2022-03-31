@@ -1,24 +1,24 @@
+import { UseFilters } from '@nestjs/common';
+import { Scene, SceneEnter, Ctx, Action, On } from 'nestjs-telegraf';
 import {
-  Scene,
-  SceneEnter,
-  SceneLeave,
-  Ctx,
-  Action,
-  On,
-} from 'nestjs-telegraf';
-import {
-  APPROVE_SCENE,
   EUR_TO_USDT_AMOUNT_SCENE,
   EUR_TO_USDT_WALLET_SCENE,
   SUPPORT_SCENE,
   WALLET_SCENE,
 } from '../bot.constants';
 import { COMMANDS } from '../bot.constants';
+import { BotFilter } from '../bot.filter';
 import { Context } from '../bot.interface';
 import { BotService } from '../bot.service';
-import { commandHandler, deleteUserReplyMessage } from '../bot.utils';
+import {
+  addPrevScene,
+  backCallback,
+  commandHandler,
+  deleteUserReplyMessage,
+} from '../bot.utils';
 
 @Scene(EUR_TO_USDT_AMOUNT_SCENE)
+@UseFilters(BotFilter)
 export class EurToUsdtAmountScene {
   constructor(private readonly botService: BotService) {}
   @SceneEnter()
@@ -29,13 +29,15 @@ export class EurToUsdtAmountScene {
 
   @Action(COMMANDS.SUPPORT)
   async onSupportAction(@Ctx() ctx: Context) {
-    await ctx.scene.enter(SUPPORT_SCENE);
+    const state = addPrevScene(ctx, EUR_TO_USDT_AMOUNT_SCENE);
+    await ctx.scene.enter(SUPPORT_SCENE, state);
     return;
   }
 
   @Action(COMMANDS.BACK)
   async onBackAction(@Ctx() ctx: Context) {
-    await ctx.scene.enter(WALLET_SCENE);
+    await this.botService.start(ctx);
+    await ctx.scene.leave();
     return;
   }
 
@@ -48,11 +50,12 @@ export class EurToUsdtAmountScene {
       }
       await deleteUserReplyMessage(ctx);
       if (!Number(amount)) {
-        const message = `Сумма для перевода должна быть числом и не содежать букв.\nВведи сумму для перевода`;
-        await this.botService.invalidAmount(ctx, message);
+        await this.botService.invalidAmount(ctx);
         return;
       }
-      await ctx.scene.enter(EUR_TO_USDT_WALLET_SCENE);
+      const state = addPrevScene(ctx, EUR_TO_USDT_WALLET_SCENE);
+      state.amount = amount;
+      await ctx.scene.enter(EUR_TO_USDT_WALLET_SCENE, state);
       return;
     }
   }

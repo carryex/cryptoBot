@@ -1,17 +1,24 @@
+import { UseFilters } from '@nestjs/common';
 import { Scene, SceneEnter, Ctx, Action, On } from 'nestjs-telegraf';
 import {
   EUR_TO_USDT_AMOUNT_SCENE,
   EUR_TO_USDT_APPROVE_SCENE,
   EUR_TO_USDT_WALLET_SCENE,
   SUPPORT_SCENE,
-  WALLET_SCENE,
 } from '../bot.constants';
 import { COMMANDS } from '../bot.constants';
+import { BotFilter } from '../bot.filter';
 import { Context } from '../bot.interface';
 import { BotService } from '../bot.service';
-import { commandHandler, deleteUserReplyMessage } from '../bot.utils';
+import {
+  addPrevScene,
+  backCallback,
+  commandHandler,
+  deleteUserReplyMessage,
+} from '../bot.utils';
 
 @Scene(EUR_TO_USDT_WALLET_SCENE)
+@UseFilters(BotFilter)
 export class EurToUsdtWalletScene {
   constructor(private readonly botService: BotService) {}
   @SceneEnter()
@@ -22,13 +29,15 @@ export class EurToUsdtWalletScene {
 
   @Action(COMMANDS.SUPPORT)
   async onSupportAction(@Ctx() ctx: Context) {
-    await ctx.scene.enter(SUPPORT_SCENE);
+    const state = addPrevScene(ctx, EUR_TO_USDT_WALLET_SCENE);
+    await ctx.scene.enter(SUPPORT_SCENE, state);
     return;
   }
 
   @Action(COMMANDS.BACK)
   async onBackAction(@Ctx() ctx: Context) {
-    await ctx.scene.enter(EUR_TO_USDT_AMOUNT_SCENE);
+    const { scene, state } = backCallback(ctx, EUR_TO_USDT_AMOUNT_SCENE);
+    await ctx.scene.enter(scene, state);
     return;
   }
 
@@ -40,7 +49,10 @@ export class EurToUsdtWalletScene {
         return;
       }
       await deleteUserReplyMessage(ctx);
-      await ctx.scene.enter(EUR_TO_USDT_APPROVE_SCENE);
+      const state = ctx.scene.session.state;
+      state.wallet = wallet;
+      state.prevScene = [];
+      await ctx.scene.enter(EUR_TO_USDT_APPROVE_SCENE, state);
       return;
     }
   }
