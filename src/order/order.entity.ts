@@ -20,6 +20,7 @@ export enum OrderStatus {
   COLLECTED = 'COLLECTED',
   CRYPTO_RECEIVED = 'CRYPTO_RECEIVED',
   WAITING_CRYPTO = 'WAITING_CRYPTO',
+  IN_CHECK = 'IN_CHECK',
 }
 
 @Entity()

@@ -1,4 +1,5 @@
-import { UseFilters } from '@nestjs/common';
+import { Injectable, UseFilters } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Scene, SceneEnter, Ctx, Action } from 'nestjs-telegraf';
 import { CreateOrderDto } from 'src/order/dto/createOrder.dto';
 import { OrderStatus } from 'src/order/order.entity';
@@ -19,12 +20,14 @@ import { addPrevScene } from '../bot.utils';
 
 @Scene(APPROVE_SCENE)
 @UseFilters(BotFilter)
+@Injectable()
 export class ApproveScene {
   constructor(
     private readonly botService: BotService,
     private readonly orderService: OrderService,
     private readonly scanService: ScanService,
     private readonly pullService: PullService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
   @SceneEnter()
   async onSceneEnter(@Ctx() ctx: Context) {
@@ -69,6 +72,10 @@ export class ApproveScene {
   @Action(COMMANDS.APPROVE_TRANSACTION)
   async onAproveTransactionAction(@Ctx() ctx: Context) {
     const orderId = ctx.scene.session.state.orderId;
+    const updateOrderDto = {
+      status: OrderStatus.IN_CHECK,
+    };
+    await this.orderService.update(orderId, updateOrderDto);
     await ctx.scene.enter(ORDER_SCENE, { orderId });
     return;
   }

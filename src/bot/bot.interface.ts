@@ -6,6 +6,7 @@ export interface Context extends BaseContext {
   update: Update.CallbackQueryUpdate;
   session: SessionData;
   scene: Scenes.SceneContextScene<Context, MySceneSession>;
+  match: any;
 }
 
 interface SessionData extends Scenes.SceneSession<MySceneSession> {

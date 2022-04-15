@@ -9,10 +9,11 @@ import { OrderModule } from './order/order.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { PullModule } from './pull/pull.module';
 import { AppService } from './app.service';
-
+import { EventEmitterModule } from '@nestjs/event-emitter';
 @Module({
   imports: [
     BotModule,
+    EventEmitterModule.forRoot(),
     TypeOrmModule.forRoot(),
     ScheduleModule.forRoot(),
     UserModule,

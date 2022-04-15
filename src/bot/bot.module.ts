@@ -26,6 +26,7 @@ import { EurToUsdtWalletScene } from './scenes/eurToUsdtWallet.scene';
 import { OrderModule } from 'src/order/order.module';
 import { PullFilledScene } from './scenes/pullFilled.scene';
 import { PullModule } from 'src/pull/pull.module';
+import { BotListener } from './bot.listener';
 
 @Module({
   imports: [
@@ -62,7 +63,8 @@ import { PullModule } from 'src/pull/pull.module';
     EurToUsdtApproveScene,
     EurToUsdtWalletScene,
     PullFilledScene,
+    BotListener,
   ],
-  exports: [BotService],
+  exports: [BotService, BotListener],
 })
 export class BotModule {}

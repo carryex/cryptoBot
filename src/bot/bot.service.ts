@@ -3,7 +3,7 @@ import { ScanService } from '../scan/scan.service';
 import { Markup, Telegraf } from 'telegraf';
 import { Context } from './bot.interface';
 import { orderService, replyOrEdit } from './bot.utils';
-import { BotName, BUTTONS, PULL_FILLED_SCENE, TEXT } from './bot.constants';
+import { BotName, BUTTONS, TEXT } from './bot.constants';
 import { Order } from 'src/order/order.entity';
 import { InjectBot } from 'nestjs-telegraf';
 @Injectable()
@@ -14,16 +14,17 @@ export class BotService {
     private scanService: ScanService,
   ) {}
 
+  async sendBaseMessage(message: any) {
+    console.log(message);
+    await this.bot.telegram.sendMessage(message.chatId, message.text);
+    return;
+  }
+
   async sendMessage(order: Order) {
-    const buttons = [[BUTTONS.APPROVE_TRANSACTION, BUTTONS.ORDERS]];
-    const inlineButtons = Markup.inlineKeyboard(buttons);
-    // this.bot.context.scene.enter(PULL_FILLED_SCENE, { orderId: order.id });
     const message = await this.bot.telegram.sendMessage(
       order.chatId,
-      TEXT.PULL_FILLED(order.amount),
-      // inlineButtons,
+      TEXT.PULL_FILLED(order.amount, order.id),
     );
-    console.log(message);
     return message;
   }
 

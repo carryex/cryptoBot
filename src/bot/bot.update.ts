@@ -1,5 +1,13 @@
 import { UseFilters, UseInterceptors } from '@nestjs/common';
-import { InjectBot, Ctx, Start, Update, Action } from 'nestjs-telegraf';
+import {
+  InjectBot,
+  Ctx,
+  Start,
+  Update,
+  Action,
+  Command,
+  Hears,
+} from 'nestjs-telegraf';
 import { Telegraf } from 'telegraf';
 import {
   BotName,
@@ -14,6 +22,8 @@ import { BotService } from './bot.service';
 import { UserService } from 'src/user/user.service';
 import { createUserDtoFactory } from './bot.utils';
 import { COMMANDS } from './bot.constants';
+import { OrderService } from 'src/order/order.service';
+import { OrderStatus } from 'src/order/order.entity';
 
 @Update()
 @UseInterceptors(BotInterceptor)
@@ -24,6 +34,7 @@ export class BotUpdate {
     private readonly bot: Telegraf<Context>,
     private readonly botService: BotService,
     private readonly userService: UserService,
+    private readonly orderService: OrderService,
   ) {}
 
   @Start()
@@ -48,5 +59,17 @@ export class BotUpdate {
   @Action(COMMANDS.ESTATE)
   async onEstate(@Ctx() context: Context) {
     await context.scene.enter(ESTATE_SCENE);
+  }
+
+  @Hears(new RegExp(/\/approve\s(.*)/))
+  async onApprove(@Ctx() context: Context) {
+    if (context.match && context.match[1]) {
+      const orderId = context.match[1];
+      const updateOrderDto = {
+        status: OrderStatus.IN_CHECK,
+      };
+      await this.orderService.update(orderId, updateOrderDto);
+    }
+    return;
   }
 }
